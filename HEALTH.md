@@ -1,18 +1,22 @@
 # Abilities — Health
 
-## Health Score: 72/100 🟡
-**Status:** 🟡 **FAIR** (Updated 2026-04-15)
+## Health Score: 75/100 🟡
+**Status:** 🟡 **FAIR** (Updated 2026-04-16)
 
 ---
 
 ## Anti-Pattern Audit Findings
 
-### ✅ RESOLVED
+### ✅ RESOLVED (2026-04-16)
+| Severity | File | Issue | Resolution |
+|----------|------|-------|------------|
+| MEDIUM | All files | Framework.Abilities dependency | Created `Core/Abilities.Abstractions.cs` with local abstractions |
+
+### ✅ RESOLVED (2026-04-15)
 | Severity | File | Issue | Resolution |
 |----------|------|-------|------------|
 | MEDIUM | `AbilityExecutionPipeline.cs` | DEAD CODE stub implementations | Now uses `IEffectExecutor` — `ApplyEffects` calls executor with ability effects |
 | MEDIUM | `AbilityCommandHandler.cs` | DEAD CODE stub with NOTE | Now uses `IAbilityDefinition` interface |
-| MEDIUM | `TargetingValidation.cs` | DEAD CODE stub returning success | Unchanged — still stub, P2 |
 
 ### ⚠️ REMAINING Issues
 
@@ -22,7 +26,25 @@
 
 ---
 
-## Framework Integration Complete (2026-04-15)
+## Local Abstractions (2026-04-16)
+
+```
+Core/Abilities.Abstractions.cs
+├── IAbilityDefinition     # Local interface (was Framework.Abilities)
+├── AbilityKind            # Enum: Buff, Debuff, Heal, Damage, Utility, Summon
+└── AbilitySlotKind        # Enum: Active, Passive, Toggle
+```
+
+### Why Local Abstractions?
+
+`MoonBark.Framework.Abilities` was removed because:
+- `IAbilityDefinition` contained game-specific `ManaCost`
+- Framework should not contain game-specific ability concepts
+- All ability abstractions now live in the Abilities plugin itself
+
+---
+
+## Framework Integration (2026-04-15)
 
 | Interface | Implementation |
 |-----------|---------------|
@@ -30,9 +52,10 @@
 | `IEffectDefinition` | `AbilityEffectDefinition` + 6 concrete types in Core/Effects/ |
 | `IEffectExecutor` | `AbilityExecutor` in Core/Effects/ |
 
-### New Structure
+### Current Structure
 
 ```
+Core/Abilities.Abstractions.cs  # Local IAbilityDefinition, AbilityKind, AbilitySlotKind
 Core/Effects/
 ├── AbilityEffectDefinitions.cs  # AbilityEffectDefinition base + 6 concrete effects
 └── AbilityExecutor.cs          # IEffectExecutor implementation
@@ -58,7 +81,7 @@ Core/Execution/
 ## Architecture
 
 ```
-IAbilityDefinition (Framework.Abilities)
+IAbilityDefinition (Local.Abstractions)
 ├── Id, Name, ManaCost, Cooldown
 ├── Kind (Buff/Debuff/Heal/Damage/Utility/Summon)
 ├── RequiresTarget, CanTargetSelf, Range
@@ -97,4 +120,4 @@ AbilityExecutionPipeline
 
 ---
 
-*Last Updated: 2026-04-15*
+*Last Updated: 2026-04-16*

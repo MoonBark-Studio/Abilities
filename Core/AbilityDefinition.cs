@@ -1,7 +1,6 @@
 namespace MoonBark.Abilities;
 
 using System.Collections.Generic;
-using MoonBark.Framework.Abilities;
 using MoonBark.Framework.Effects;
 
 public sealed class AbilityDefinition : IAbilityDefinition

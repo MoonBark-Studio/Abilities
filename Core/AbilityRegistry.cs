@@ -1,7 +1,6 @@
 namespace MoonBark.Abilities;
 
 using System.Collections.Generic;
-using MoonBark.Framework.Abilities;
 
 /// <summary>
 /// Central registry for ability definitions.

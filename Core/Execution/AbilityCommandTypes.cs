@@ -1,16 +1,42 @@
 namespace MoonBark.Abilities;
 
 using MoonBark.Framework.Commands;
+using MoonBark.Framework.Effects;
+
+/// <summary>
+/// Represents the action type for an ability command.
+/// </summary>
+public enum AbilityAction
+{
+    Activate,
+    Deactivate,
+    Trigger,
+    Cancel
+}
+
+/// <summary>
+/// Marker interface for ability commands. Extends ICommand to integrate with the framework command system.
+/// </summary>
+public interface IAbilityCommand : ICommand
+{
+    string AbilityId { get; }
+    AbilityAction AbilityAction { get; }
+    string? TargetEntityId { get; }
+    string? TargetPosition { get; }
+    TargetId Source { get; }
+}
 
 public readonly record struct AbilityCommand(
     string AbilityId,
     AbilityAction AbilityAction,
     string? TargetEntityId,
     string? TargetPosition,
-    CommandSource Source
+    TargetId Source
 ) : IAbilityCommand
 {
     public string CommandType => "ability";
+    
+    TargetId? ICommand.SubjectId => Source;
 }
 
 public readonly record struct CommandValidationResult(

@@ -1,7 +1,6 @@
 namespace MoonBark.Abilities;
 
 using MoonBark.Framework.Targeting;
-using MoonBark.Framework.Abilities;
 using Friflo.Engine.ECS;
 
 /// <summary>

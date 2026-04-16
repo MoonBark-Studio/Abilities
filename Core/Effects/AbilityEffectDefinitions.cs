@@ -1,7 +1,6 @@
 namespace MoonBark.Abilities.Effects;
 
 using MoonBark.Framework.Effects;
-using MoonBark.Framework.Abilities;
 
 public class AbilityEffectDefinition : IEffectDefinition
 {
