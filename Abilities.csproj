@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Abilities</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MoonBark.Framework\MoonBark.Framework.csproj" />
+    <ProjectReference Include="..\EntityTargetingSystem\EntityTargetingSystem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Exclude test files from the main plugin build -->
+    <Compile Remove="Tests/**/*.cs" />
+  </ItemGroup>
+</Project>
