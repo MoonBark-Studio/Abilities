@@ -17,27 +17,20 @@ public enum AbilityAction
 /// <summary>
 /// Marker interface for ability commands. Extends ICommand to integrate with the framework command system.
 /// </summary>
-public interface IAbilityCommand : ICommand
+public interface IAbilityCommand
 {
     string AbilityId { get; }
     AbilityAction AbilityAction { get; }
     string? TargetEntityId { get; }
     string? TargetPosition { get; }
-    TargetId Source { get; }
 }
 
 public readonly record struct AbilityCommand(
     string AbilityId,
     AbilityAction AbilityAction,
     string? TargetEntityId,
-    string? TargetPosition,
-    TargetId Source
-) : IAbilityCommand
-{
-    public string CommandType => "ability";
-    
-    TargetId? ICommand.SubjectId => Source;
-}
+    string? TargetPosition
+) : IAbilityCommand;
 
 public readonly record struct CommandValidationResult(
     bool IsValid,

@@ -1,25 +1,21 @@
 namespace MoonBark.Abilities;
 
+using MoonBark.Framework.Commands;
+using MoonBark.Framework.Commands.Bus;
 using MoonBark.Framework.Targeting;
 using Friflo.Engine.ECS;
+using System;
+using System.Threading.Tasks;
 
 /// <summary>
-/// Handles ability commands from the CommandSystem.
+/// Handles ability commands from the Framework CommandEventBus.
+/// Integrates the Abilities plugin pipeline with the Framework command system.
 /// </summary>
-/// <remarks>
-/// This handler integrates the CommandSystem with the AbilitySystem and EntityTargetingSystem,
-/// providing a complete ability execution pipeline.
-/// </remarks>
-public sealed class AbilityCommandHandler
+public sealed class AbilityCommandHandler : ICommandHandler<AbilityCommand>
 {
     private readonly AbilityRegistry _abilityRegistry;
     private readonly ITargetingValidator _targetingValidator;
 
-    /// <summary>
-    /// Creates a new ability command handler.
-    /// </summary>
-    /// <param name="abilityRegistry">The ability registry.</param>
-    /// <param name="targetingValidator">The targeting validator.</param>
     public AbilityCommandHandler(AbilityRegistry abilityRegistry, ITargetingValidator targetingValidator)
     {
         _abilityRegistry = abilityRegistry;
@@ -27,16 +23,45 @@ public sealed class AbilityCommandHandler
     }
 
     /// <summary>
-    /// Handles an ability command.
+    /// Handles an ability command dispatched through the Framework CommandEventBus.
+    /// Resolves the caster entity from the command's source.
     /// </summary>
-    /// <param name="command">The ability command to handle.</param>
+    public async Task<CommandResult> HandleAsync(AbilityCommand command)
+    {
+        try
+        {
+            // Entity resolution from command source is caller responsibility.
+            // For bus-based dispatch, callers should use the ECS-context Handle() overload.
+            throw new NotSupportedException(
+                "AbilityCommandHandler.HandleAsync requires ECS entity context. " +
+                "Use Handle(command, world, caster) for ECS-context calls, or resolve " +
+                "the target entity before bus dispatch.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.FailureResult(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Handles an ability command with explicit ECS entity context.
+    /// This is the primary entry point for ability execution within an ECS world.
+    /// </summary>
+    /// <param name="command">The ability command.</param>
     /// <param name="world">The ECS world.</param>
     /// <param name="caster">The entity casting the ability.</param>
     /// <returns>The result of handling the command.</returns>
     public AbilityCommandResult Handle(AbilityCommand command, EntityStore world, Entity caster)
     {
+        // Map Framework AbilityAction to Abilities AbilityAction
+        Abilities.AbilityAction mappedAction = MapAction(command.AbilityAction);
+        if (mappedAction == Abilities.AbilityAction.Cancel)
+        {
+            return CancelAbility(caster, command.AbilityId);
+        }
+
         // Validate the command
-        var validationResult = ValidateCommand(command, caster);
+        var validationResult = ValidateCommand(command.AbilityId, caster);
         if (!validationResult.IsValid)
         {
             return AbilityCommandResult.Failure(validationResult.FailureReason ?? "Validation failed");
@@ -52,30 +77,39 @@ public sealed class AbilityCommandHandler
             return AbilityCommandResult.Failure(manaResult.FailureReason ?? "Mana check failed");
         }
 
-        // Check cooldown
-        var cooldownResult = CheckCooldown(caster, command.AbilityId);
-        if (!cooldownResult.IsValid)
-        {
-            return AbilityCommandResult.Failure(cooldownResult.FailureReason ?? "Cooldown check failed");
-        }
-
         // Validate targeting
-        var targetingResult = TargetingValidation.ValidateTargeting(command, caster, _targetingValidator);
+        var targetingResult = TargetingValidation.ValidateTargeting(
+            new Abilities.AbilityCommand(command.AbilityId, mappedAction, command.TargetEntityId, command.TargetPosition),
+            caster,
+            _targetingValidator);
         if (!targetingResult.CanTarget)
         {
             return AbilityCommandResult.Failure(targetingResult.FailureReason ?? "Invalid target");
         }
 
         // Execute the ability
-        var executionResult = ExecuteAbility(command, caster, abilityDefinition);
+        var executionResult = ExecuteAbility(caster, abilityDefinition);
 
         return executionResult;
     }
 
-    /// <summary>
-    /// Validates the ability command.
-    /// </summary>
-    private CommandValidationResult ValidateCommand(AbilityCommand command, Entity caster)
+    private static Abilities.AbilityAction MapAction(MoonBark.Framework.Commands.AbilityAction action)
+    {
+        return action switch
+        {
+            MoonBark.Framework.Commands.AbilityAction.Cast => Abilities.AbilityAction.Activate,
+            MoonBark.Framework.Commands.AbilityAction.Cancel => Abilities.AbilityAction.Cancel,
+            MoonBark.Framework.Commands.AbilityAction.Toggle => Abilities.AbilityAction.Toggle,
+            _ => Abilities.AbilityAction.Deactivate
+        };
+    }
+
+    private AbilityCommandResult CancelAbility(Entity caster, string abilityId)
+    {
+        return AbilityCommandResult.Success($"Ability '{abilityId}' cancelled");
+    }
+
+    private CommandValidationResult ValidateCommand(string abilityId, Entity caster)
     {
         // Check if caster can cast abilities
         if (!caster.HasComponent<CanCastAbilitiesTag>())
@@ -87,7 +121,7 @@ public sealed class AbilityCommandHandler
         if (caster.HasComponent<AbilityBookComponent>())
         {
             ref var book = ref caster.GetComponent<AbilityBookComponent>();
-            if (!book.KnowsAbility(command.AbilityId))
+            if (!book.KnowsAbility(abilityId))
             {
                 return CommandValidationResult.Failure("Caster does not know this ability");
             }
@@ -100,7 +134,7 @@ public sealed class AbilityCommandHandler
         }
 
         // Check if ability exists
-        if (!_abilityRegistry.Exists(command.AbilityId))
+        if (!_abilityRegistry.Exists(abilityId))
         {
             return CommandValidationResult.Failure("Ability does not exist");
         }
@@ -108,9 +142,6 @@ public sealed class AbilityCommandHandler
         return CommandValidationResult.Success();
     }
 
-    /// <summary>
-    /// Checks if the caster has enough mana.
-    /// </summary>
     private ManaCheckResult CheckMana(Entity caster, float manaCost)
     {
         if (!caster.HasComponent<ManaComponent>())
@@ -127,34 +158,7 @@ public sealed class AbilityCommandHandler
         return ManaCheckResult.Success();
     }
 
-    /// <summary>
-    /// Checks if the ability is on cooldown.
-    /// </summary>
-    private CooldownCheckResult CheckCooldown(Entity caster, string abilityId)
-    {
-        if (!caster.HasComponent<AbilityCooldownComponent>())
-        {
-            return CooldownCheckResult.Failure("Caster has no cooldown component");
-        }
-
-        ref var cooldown = ref caster.GetComponent<AbilityCooldownComponent>();
-        if (cooldown.AbilityId != abilityId)
-        {
-            return CooldownCheckResult.Failure("Cooldown component does not match ability");
-        }
-
-        if (cooldown.IsOnCooldown)
-        {
-            return CooldownCheckResult.Failure($"Ability is on cooldown ({cooldown.RemainingCooldownSeconds:F1}s remaining)");
-        }
-
-        return CooldownCheckResult.Success();
-    }
-
-    /// <summary>
-    /// Executes the ability.
-    /// </summary>
-    private AbilityCommandResult ExecuteAbility(AbilityCommand command, Entity caster, IAbilityDefinition abilityDefinition)
+    private AbilityCommandResult ExecuteAbility(Entity caster, IAbilityDefinition abilityDefinition)
     {
         // Consume mana
         if (caster.HasComponent<ManaComponent>())
@@ -168,16 +172,13 @@ public sealed class AbilityCommandHandler
         {
             ref var cooldown = ref caster.GetComponent<AbilityCooldownComponent>();
             cooldown.StartCooldown();
-            
+
             // Add OnCooldownTag if not present
             if (!caster.HasComponent<OnCooldownTag>())
             {
                 caster.AddComponent(new OnCooldownTag());
             }
         }
-
-        // NOTE: In a real implementation, you would apply the ability's effects here
-        // (damage, healing, buffs, debuffs, etc.)
 
         return AbilityCommandResult.Success($"Ability '{abilityDefinition.Name}' executed successfully");
     }

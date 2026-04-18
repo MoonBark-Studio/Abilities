@@ -1,157 +1,30 @@
 # Abilities
 
-**Internal plugin** — ECS-based ability system with CommandSystem integration.
+**Module:** `internal.Abilities`
 
-## What It Is
+## Overview
+<!-- What this folder contains and its purpose -->
 
-An ability system for Godot games using Friflo ECS. Provides:
-- Ability definitions (metadata: cost, cooldown, range, effects)
-- Ability execution pipeline (validation → resource check → targeting → execute)
-- ECS components for runtime state (cooldowns, mana, ability book)
-- Integration with Framework's slot system for hotbar UI
+## Key Types (18 files, ~1740 lines)
+AbilitiesModule, AbilityAction, AbilityBookComponent, AbilityCommandHandler, AbilityCommandTypesTests, AbilityComponent, AbilityComponentTests, AbilityCooldownComponent, AbilityCooldownSystem, AbilityDefinition, AbilityDefinitionTests, AbilityEffectDefinition, AbilityExecutionPipeline, AbilityExecutionStage, AbilityExecutor, AbilityKind, AbilityLearningComponent, AbilityRegistry, AbilityRegistryTests, AbilitySlotKind
 
-## Core Concepts
-
-### AbilityDefinition
-Metadata for an ability. Implements `IAbilityDefinition` (local to this plugin).
-
-```csharp
-AbilityDefinition fireball = new(
-    id: "fireball",
-    name: "Fireball",
-    manaCost: 30f,
-    baseCooldownSeconds: 5f,
-    kind: AbilityKind.Damage,
-    requiresTarget: true,
-    range: 10f
-);
-```
-
-### AbilityBookComponent (ECS)
-Tracks which abilities an entity knows.
-
-```csharp
-entity.AddComponent(new AbilityBookComponent());
-entity.GetComponent<AbilityBookComponent>().LearnAbility("fireball");
-```
-
-### IActionSlot Integration
-Abilities implement `IHasEffects` (Framework) and can be placed in Framework's `IActionSlot`:
-
-```csharp
-// Framework slot
-IActionSlot slot = new ActionSlot(index: 0, content: content, executor: executor);
-
-// Content wraps IHasEffects
-ActionContent content = ActionContent.FromEffect(abilityEffect);
-```
-
----
+## Namespaces
+- `MoonBark.Abilities`
+- `MoonBark.Abilities.Effects`
+- `MoonBark.Abilities.Tests`
 
 ## Architecture
+<!-- Key components and how they fit together -->
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Framework                               │
-│  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐  │
-│  │ IActionSlot │  │IHasEffects │  │ IEffectDefinition │  │
-│  │ (slot UI)  │  │(items,etc) │  │ (damage, heal)   │  │
-│  └─────────────┘  └─────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ implements
-┌─────────────────────────────────────────────────────────────┐
-│                   Abilities Plugin                          │
-│  ┌─────────────────────────────────────────────────────┐  │
-│  │ IAbilityDefinition (local)                           │  │
-│  │ + ManaCost, Cooldown, Range, Kind, SlotKind       │  │
-│  └─────────────────────────────────────────────────────┘  │
-│  ┌─────────────────┐  ┌─────────────────────────────────┐ │
-│  │ AbilityDefinition │  │ AbilityExecutor                 │ │
-│  │ : IAbilityDefinition │  │ Execute(effect, context)      │ │
-│  │ + Effects[]      │  └─────────────────────────────────┘ │
-│  └─────────────────┘                                      │
-│  ┌─────────────────────────────────────────────────────┐ │
-│  │ AbilityCommandHandler                               │ │
-│  │ Validates → Checks Resources → Executes            │ │
-│  └─────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────┐ │
-│  │ ECS Components                                      │ │
-│  │ AbilityBookComponent | ManaComponent | Cooldown...  │ │
-│  └─────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+## ECS Architecture (v2)
+- ECS subdirectories: none
+- ECS files outside subdirectories: 9
+- Flat structure: Core/, ECS/, Godot/ (cs/ prefix not required)
 
----
-
-## Components
-
-| Component | Purpose |
-|-----------|---------|
-| `AbilityBookComponent` | Tracks learned abilities for an entity |
-| `ManaComponent` | Resource pool for ability costs |
-| `AbilityCooldownComponent` | Tracks cooldown state per ability |
-| `CooldownReductionComponent` | Modifies cooldown duration |
-| `CanCastAbilitiesTag` | Marks entity as able to cast |
-| `LearningAbilityTag` | Marks entity currently learning |
-| `OnCooldownTag` | Marks entity on cooldown |
-
----
-
-## Systems
-
-| System | Update Frequency |
-|--------|-------------|
-| `AbilityCooldownSystem` | Per-frame |
-| `ManaRegenerationSystem` | Per-frame |
-
----
-
-## Effects
-
-Effects implement Framework's `IEffectDefinition`:
-
-| Effect | Class | Purpose |
-|--------|-------|---------|
-| Damage | `DamageAbilityEffect` | Deal damage to target |
-| Heal | `HealAbilityEffect` | Restore health |
-| Buff | `BuffAbilityEffect` | Apply beneficial status |
-| Debuff | `DebuffAbilityEffect` | Apply harmful status |
-| Utility | `UtilityAbilityEffect` | Non-combat effects |
-| Summon | `SummonAbilityEffect` | Spawn entities |
-
----
-
-## Dependency Graph
-
-```
-Abilities
-├── MoonBark.Framework
-│   ├── Effects (IEffectDefinition, EffectContext)
-│   ├── Commands (ICommand, TargetId)
-│   ├── Targeting (ITargetingValidator)
-│   └── Slots (IActionSlot, IHasEffects)
-├── Friflo.Engine.ECS
-└── EntityTargetingSystem
-```
-
----
-
-## Design Decisions
-
-### Why Local IAbilityDefinition?
-
-The Framework provides `IHasEffects` for slot content. The Abilities plugin provides `IAbilityDefinition` for ability-specific metadata (ManaCost, Cooldown, Range). This separation keeps the Framework game-agnostic while Abilities owns mana/cooldown-specific logic.
-
-### Resource Model
-
-Currently uses `ManaComponent`. For games with different resources (stamina, energy, rage):
-1. Add new resource components
-2. Modify `AbilityCommandHandler.CheckMana()` to check the appropriate resource
-3. The pattern scales to multiple resource types
-
----
+## Dependencies
+<!-- What this module depends on -->
 
 ## Status
-
-**Internal plugin** — Not part of the public SDK. Owned by MoonBark Studio.
+- ✅ Audited: 2026-04-18
+- Changed files this run: 1
+- File count: 18 C# files (~1740 lines)
