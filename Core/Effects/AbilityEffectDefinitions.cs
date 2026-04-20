@@ -1,4 +1,4 @@
-namespace MoonBark.Abilities.Effects;
+namespace MoonBark.Abilities.Core.Effects;
 
 using MoonBark.Framework.Effects;
 

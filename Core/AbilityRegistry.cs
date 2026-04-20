@@ -1,4 +1,4 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core;
 
 using System.Collections.Generic;
 

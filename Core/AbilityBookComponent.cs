@@ -1,13 +1,14 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core;
 
-using Friflo.Engine.ECS;
+using System;
 using System.Collections.Generic;
+using Friflo.Engine.ECS;
 
 /// <summary>
 /// Component that tracks all abilities known/learned by an entity.
 /// Acts as an ability book registry per entity.
 /// </summary>
-public struct AbilityBookComponent : IComponent
+public struct AbilityBookComponent : IComponent, IEquatable<AbilityBookComponent>
 {
     /// <summary>
     /// Set of ability IDs that the entity knows and can cast.
@@ -83,12 +84,19 @@ public struct AbilityBookComponent : IComponent
     {
         return new HashSet<string>(KnownAbilities);
     }
+
+    public bool Equals(AbilityBookComponent other) =>
+        KnownAbilities.SetEquals(other.KnownAbilities);
+    public override bool Equals(object? obj) => obj is AbilityBookComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(KnownAbilities.Count);
+    public static bool operator ==(AbilityBookComponent left, AbilityBookComponent right) => left.Equals(right);
+    public static bool operator !=(AbilityBookComponent left, AbilityBookComponent right) => !left.Equals(right);
 }
 
 /// <summary>
 /// Component that tracks ability learning progress and requirements.
 /// </summary>
-public struct AbilityLearningComponent : IComponent
+public struct AbilityLearningComponent : IComponent, IEquatable<AbilityLearningComponent>
 {
     /// <summary>
     /// Dictionary mapping ability IDs to learning progress (0.0 to 1.0).
@@ -181,15 +189,37 @@ public struct AbilityLearningComponent : IComponent
     {
         return new Dictionary<string, float>(LearningProgress);
     }
+
+    public bool Equals(AbilityLearningComponent other) =>
+        LearningProgress.Count == other.LearningProgress.Count &&
+        LearningProgress.All(kvp => other.LearningProgress.TryGetValue(kvp.Key, out var v) && v == kvp.Value);
+    public override bool Equals(object? obj) => obj is AbilityLearningComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(LearningProgress.Count);
+    public static bool operator ==(AbilityLearningComponent left, AbilityLearningComponent right) => left.Equals(right);
+    public static bool operator !=(AbilityLearningComponent left, AbilityLearningComponent right) => !left.Equals(right);
 }
 
 /// <summary>
 /// Tag for entities that can learn new abilities.
 /// </summary>
-public struct CanLearnAbilitiesTag : IComponent { }
+public struct CanLearnAbilitiesTag : IComponent, IEquatable<CanLearnAbilitiesTag>
+{
+    public bool Equals(CanLearnAbilitiesTag other) => true;
+    public override bool Equals(object? obj) => obj is CanLearnAbilitiesTag;
+    public override int GetHashCode() => 0;
+    public static bool operator ==(CanLearnAbilitiesTag left, CanLearnAbilitiesTag right) => true;
+    public static bool operator !=(CanLearnAbilitiesTag left, CanLearnAbilitiesTag right) => false;
+}
 
 /// <summary>
 /// Tag for entities that are currently learning an ability.
 /// </summary>
-public struct LearningAbilityTag : IComponent { }
+public struct LearningAbilityTag : IComponent, IEquatable<LearningAbilityTag>
+{
+    public bool Equals(LearningAbilityTag other) => true;
+    public override bool Equals(object? obj) => obj is LearningAbilityTag;
+    public override int GetHashCode() => 0;
+    public static bool operator ==(LearningAbilityTag left, LearningAbilityTag right) => true;
+    public static bool operator !=(LearningAbilityTag left, LearningAbilityTag right) => false;
+}
 

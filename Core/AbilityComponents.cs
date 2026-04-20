@@ -1,11 +1,12 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core;
 
+using System;
 using Friflo.Engine.ECS;
 
 /// <summary>
 /// Tracks cooldown state for a specific ability on an entity.
 /// </summary>
-public struct AbilityCooldownComponent : IComponent
+public struct AbilityCooldownComponent : IComponent, IEquatable<AbilityCooldownComponent>
 {
     /// <summary>
     /// The ability ID this cooldown is tracking.
@@ -69,12 +70,21 @@ public struct AbilityCooldownComponent : IComponent
 
         return RemainingCooldownSeconds / BaseCooldownSeconds;
     }
+
+    public bool Equals(AbilityCooldownComponent other) =>
+        AbilityId == other.AbilityId &&
+        BaseCooldownSeconds == other.BaseCooldownSeconds &&
+        RemainingCooldownSeconds == other.RemainingCooldownSeconds;
+    public override bool Equals(object? obj) => obj is AbilityCooldownComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(AbilityId, BaseCooldownSeconds, RemainingCooldownSeconds);
+    public static bool operator ==(AbilityCooldownComponent left, AbilityCooldownComponent right) => left.Equals(right);
+    public static bool operator !=(AbilityCooldownComponent left, AbilityCooldownComponent right) => !left.Equals(right);
 }
 
 /// <summary>
 /// Tracks mana resource for an entity.
 /// </summary>
-public struct ManaComponent : IComponent
+public struct ManaComponent : IComponent, IEquatable<ManaComponent>
 {
     /// <summary>
     /// Current mana amount.
@@ -121,12 +131,18 @@ public struct ManaComponent : IComponent
     {
         CurrentMana = System.Math.Min(MaxMana, CurrentMana + amount);
     }
+
+    public bool Equals(ManaComponent other) => CurrentMana == other.CurrentMana && MaxMana == other.MaxMana;
+    public override bool Equals(object? obj) => obj is ManaComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(CurrentMana, MaxMana);
+    public static bool operator ==(ManaComponent left, ManaComponent right) => left.Equals(right);
+    public static bool operator !=(ManaComponent left, ManaComponent right) => !left.Equals(right);
 }
 
 /// <summary>
 /// Applies cooldown reduction modifiers to abilities.
 /// </summary>
-public struct CooldownReductionComponent : IComponent
+public struct CooldownReductionComponent : IComponent, IEquatable<CooldownReductionComponent>
 {
     /// <summary>
     /// Cooldown reduction percentage (0.0 to 1.0).
@@ -151,15 +167,35 @@ public struct CooldownReductionComponent : IComponent
     {
         return baseCooldown * (1.0f - ReductionPercentage);
     }
+
+    public bool Equals(CooldownReductionComponent other) => ReductionPercentage == other.ReductionPercentage;
+    public override bool Equals(object? obj) => obj is CooldownReductionComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(ReductionPercentage);
+    public static bool operator ==(CooldownReductionComponent left, CooldownReductionComponent right) => left.Equals(right);
+    public static bool operator !=(CooldownReductionComponent left, CooldownReductionComponent right) => !left.Equals(right);
 }
 
 /// <summary>
 /// Tag for entities that are currently on cooldown.
 /// </summary>
-public struct OnCooldownTag : IComponent { }
+public struct OnCooldownTag : IComponent, IEquatable<OnCooldownTag>
+{
+    public bool Equals(OnCooldownTag other) => true;
+    public override bool Equals(object? obj) => obj is OnCooldownTag;
+    public override int GetHashCode() => 0;
+    public static bool operator ==(OnCooldownTag left, OnCooldownTag right) => true;
+    public static bool operator !=(OnCooldownTag left, OnCooldownTag right) => false;
+}
 
 /// <summary>
 /// Tag for entities that can cast abilities.
 /// </summary>
-public struct CanCastAbilitiesTag : IComponent { }
+public struct CanCastAbilitiesTag : IComponent, IEquatable<CanCastAbilitiesTag>
+{
+    public bool Equals(CanCastAbilitiesTag other) => true;
+    public override bool Equals(object? obj) => obj is CanCastAbilitiesTag;
+    public override int GetHashCode() => 0;
+    public static bool operator ==(CanCastAbilitiesTag left, CanCastAbilitiesTag right) => true;
+    public static bool operator !=(CanCastAbilitiesTag left, CanCastAbilitiesTag right) => false;
+}
 

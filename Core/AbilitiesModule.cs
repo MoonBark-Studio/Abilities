@@ -1,6 +1,6 @@
 using MoonBark.Framework.Core;
 
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core;
 
 /// <summary>
 /// Registers Abilities services with the Framework module registry.

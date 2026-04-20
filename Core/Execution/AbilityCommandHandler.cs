@@ -1,4 +1,4 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core.Execution;
 
 using MoonBark.Framework.Commands;
 using MoonBark.Framework.Commands.Bus;

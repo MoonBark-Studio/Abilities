@@ -1,11 +1,12 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core;
 
+using System;
 using Friflo.Engine.ECS;
 
 /// <summary>
 /// Defines an ability attached to an entity with its runtime properties.
 /// </summary>
-public struct AbilityComponent : IComponent
+public struct AbilityComponent : IComponent, IEquatable<AbilityComponent>
 {
     /// <summary>
     /// Unique identifier for the ability.
@@ -41,4 +42,14 @@ public struct AbilityComponent : IComponent
         ManaCost = manaCost;
         BaseCooldownSeconds = baseCooldownSeconds;
     }
+
+    public bool Equals(AbilityComponent other) =>
+        Id == other.Id &&
+        Name == other.Name &&
+        ManaCost == other.ManaCost &&
+        BaseCooldownSeconds == other.BaseCooldownSeconds;
+    public override bool Equals(object? obj) => obj is AbilityComponent other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(Id, Name, ManaCost, BaseCooldownSeconds);
+    public static bool operator ==(AbilityComponent left, AbilityComponent right) => left.Equals(right);
+    public static bool operator !=(AbilityComponent left, AbilityComponent right) => !left.Equals(right);
 }

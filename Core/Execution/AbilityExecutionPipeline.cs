@@ -1,5 +1,6 @@
-namespace MoonBark.Abilities;
+namespace MoonBark.Abilities.Core.Execution;
 
+using System;
 using MoonBark.Framework.Targeting;
 using Friflo.Engine.ECS;
 using FrameworkEffects = MoonBark.Framework.Effects;
@@ -247,6 +248,7 @@ public readonly record struct AbilityExecutionResult(
     string? Summary,
     AbilityExecutionStage? FailedStage = null,
     TargetingFailureKind? TargetingFailureKind = null)
+    : IEquatable<AbilityExecutionResult>
 {
     /// <summary>
     /// Creates a successful ability execution result.
@@ -258,6 +260,16 @@ public readonly record struct AbilityExecutionResult(
     /// </summary>
     public static AbilityExecutionResult Failed(string reason, AbilityExecutionStage stage, TargetingFailureKind? targetingFailureKind = null) =>
         new(false, reason, stage, targetingFailureKind);
+
+    public bool Equals(AbilityExecutionResult other) =>
+        Succeeded == other.Succeeded &&
+        Summary == other.Summary &&
+        FailedStage == other.FailedStage &&
+        TargetingFailureKind == other.TargetingFailureKind;
+    public override bool Equals(object? obj) => obj is AbilityExecutionResult other && Equals(other);
+    public override int GetHashCode() => HashCode.Combine(Succeeded, Summary, FailedStage, TargetingFailureKind);
+    public static bool operator ==(AbilityExecutionResult left, AbilityExecutionResult right) => left.Equals(right);
+    public static bool operator !=(AbilityExecutionResult left, AbilityExecutionResult right) => !left.Equals(right);
 }
 
 /// <summary>
