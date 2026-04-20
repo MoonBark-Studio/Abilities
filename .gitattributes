@@ -1,0 +1,33 @@
+# Normalize line endings to LF for all text files
+* text=auto
+
+# Keep binary files binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.mp3 binary
+*.ogg binary
+*.wav binary
+*.mp4 binary
+*.webm binary
+*.ogv binary
+*.avi binary
+*.mkv binary
+*.mov binary
+*.csproj binary
+*.sln binary
+*.props binary
+*.targets binary
+*.resx binary
+*.user binary
+*.suo binary
+*.userosscache binary
+*.sln.docstates binary
