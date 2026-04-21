@@ -112,7 +112,12 @@ public sealed class AbilityDefinition : IAbilityDefinition, IEquatable<AbilityDe
     public override bool Equals(object? obj) => obj is AbilityDefinition other && Equals(other);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine(Id, Name, ManaCost, BaseCooldownSeconds, Kind, SlotKind, RequiresTarget, CanTargetSelf, Range, Effects.Count);
+    public override int GetHashCode()
+    {
+        var h = HashCode.Combine(Id, Name, ManaCost, BaseCooldownSeconds, Kind, SlotKind, RequiresTarget, CanTargetSelf);
+        h = HashCode.Combine(h, Range, Effects.Count);
+        return h;
+    }
 
     /// <summary>
     /// Checks equality between two ability definitions.

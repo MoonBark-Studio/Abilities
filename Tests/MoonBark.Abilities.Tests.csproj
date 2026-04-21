@@ -18,6 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Abilities.csproj" />
+    <ProjectReference Include="..\MoonBark.Abilities.csproj" />
   </ItemGroup>
 </Project>

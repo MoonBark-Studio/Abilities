@@ -1,6 +1,9 @@
-namespace MoonBark.Abilities.Tests;
-
+using MoonBark.Abilities.Core;
+using MoonBark.Abilities.Core.Execution;
+using MoonBark.Abilities.ECS;
 using Xunit;
+
+namespace MoonBark.Abilities.Tests;
 
 public sealed class AbilityCommandTypesTests
 {
@@ -14,12 +17,12 @@ public sealed class AbilityCommandTypesTests
     }
 
     [Fact]
-    public void AbilityExecuteResult_Success_SetsSucceeded()
+    public void AbilityCommandResult_Success_SetsSucceeded()
     {
-        AbilityExecuteResult result = AbilityExecuteResult.Success();
+        AbilityCommandResult result = AbilityCommandResult.Success("ok");
 
         Assert.True(result.Succeeded);
-        Assert.Null(result.FailureReason);
+        Assert.Equal("ok", result.Summary);
     }
 
     [Fact]
@@ -29,5 +32,14 @@ public sealed class AbilityCommandTypesTests
 
         Assert.False(result.Succeeded);
         Assert.Equal("denied", result.Summary);
+    }
+
+    [Fact]
+    public void ManaCheckResult_Failure_PreservesReason()
+    {
+        ManaCheckResult result = ManaCheckResult.Failure("insufficient mana");
+
+        Assert.False(result.IsValid);
+        Assert.Equal("insufficient mana", result.FailureReason);
     }
 }

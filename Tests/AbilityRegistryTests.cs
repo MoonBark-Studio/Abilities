@@ -1,5 +1,6 @@
 namespace MoonBark.Abilities.Tests;
 
+using MoonBark.Abilities.Core;
 using Xunit;
 
 public sealed class AbilityRegistryTests

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <remarks>
 /// This registry stores all ability definitions in a central location,
 /// providing a single source of truth for ability properties.
-/// Targeting rules are NOT stored here - they are handled by the EntityTargetingSystem plugin.
+/// Targeting rules are NOT stored here. Games (thistletide, moonbark-idle) implement targeting via their ECS game layer. Plugins expose capability — they do not own targeting boundaries.
 /// </remarks>
 public class AbilityRegistry
 {

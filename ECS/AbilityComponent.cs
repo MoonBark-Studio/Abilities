@@ -1,4 +1,4 @@
-namespace MoonBark.Abilities.Core;
+namespace MoonBark.Abilities.ECS;
 
 using System;
 using Friflo.Engine.ECS;

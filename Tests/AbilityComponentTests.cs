@@ -1,6 +1,8 @@
-namespace MoonBark.Abilities.Tests;
-
 using Xunit;
+
+namespace MoonBark.Abilities.Tests;
+using MoonBark.Abilities.Core;
+using MoonBark.Abilities.ECS;
 
 public sealed class AbilityComponentTests
 {
