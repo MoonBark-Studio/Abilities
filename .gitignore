@@ -32,3 +32,6 @@ obj/
 .DS_Store
 nul
 **/nul
+
+# Godot artifacts (added by workspace audit)
+.git/
