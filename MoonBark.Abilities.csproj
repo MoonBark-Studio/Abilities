@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MoonBark.Framework\MoonBark.Framework.csproj" />
+    <ProjectReference Include="..\..\cores\MoonBark.Framework\MoonBark.Framework.csproj" />
   </ItemGroup>
 
   <ItemGroup>
