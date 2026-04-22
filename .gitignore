@@ -1,8 +1,8 @@
 # Godot artifacts
+.godot/
 .import/
 .kilo/
 .mono/
-.godot/
 addons/
 node_modules/
 *.import
@@ -12,30 +12,30 @@ export_presets.cfg
 *.uid
 *.log
 
+# Build
 bin/
 obj/
+
+# .NET / NuGet
+*.csproj
+*.sln
+*.pck
+*.res
+
+# IDE
 .vs/
 .vscode/
 .idea/
 *.user
 *.suo
-*.cache
-*.tmp
+
+# OS
 .DS_Store
-.vs/
-.idea/
-*.user
-*.suo
-*.cache
-*.tmp
-.DS_Store
-nul
+
+# Temp
+
+# Other
 **/nul
-
-# Godot artifacts (added by workspace audit)
-
-# Missing .NET / C# patterns (workspace audit)
-*.csproj
-*.sln
-*.pck
-*.res
+*.cache
+*.tmp
+nul
