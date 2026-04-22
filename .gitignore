@@ -23,7 +23,6 @@ obj/
 *.tmp
 .DS_Store
 .vs/
-.vscode/
 .idea/
 *.user
 *.suo
@@ -34,5 +33,9 @@ nul
 **/nul
 
 # Godot artifacts (added by workspace audit)
-.git/
-.vscode/
+
+# Missing .NET / C# patterns (workspace audit)
+*.csproj
+*.sln
+*.pck
+*.res
