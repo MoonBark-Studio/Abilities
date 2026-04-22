@@ -23,15 +23,19 @@ export_presets.cfg
 *.log
 
 # Build
+# Build
 bin/
 obj/
 *.dll
 *.pdb
 *.exe
+artifacts/
 
 # .NET / NuGet
-*.csproj
-*.sln
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+*.snupkg
 *.pck
 *.res
 
@@ -44,8 +48,16 @@ obj/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Temp
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Godot/Mono crash logs
+mono_crash.*
 
 # Other
 **/nul
