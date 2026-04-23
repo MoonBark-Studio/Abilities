@@ -50,6 +50,9 @@ project.fragment.lock.json
 .DS_Store
 Thumbs.db
 
+# Godot artifacts
+addons/
+
 # Temp
 tmp/
 temp/
