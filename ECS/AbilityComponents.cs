@@ -178,24 +178,14 @@ public struct CooldownReductionComponent : IComponent, IEquatable<CooldownReduct
 /// <summary>
 /// Tag for entities that are currently on cooldown.
 /// </summary>
-public struct OnCooldownTag : IComponent, IEquatable<OnCooldownTag>
+public struct OnCooldownTag : IComponent
 {
-    public bool Equals(OnCooldownTag other) => true;
-    public override bool Equals(object? obj) => obj is OnCooldownTag;
-    public override int GetHashCode() => 0;
-    public static bool operator ==(OnCooldownTag left, OnCooldownTag right) => true;
-    public static bool operator !=(OnCooldownTag left, OnCooldownTag right) => false;
 }
 
 /// <summary>
 /// Tag for entities that can cast abilities.
 /// </summary>
-public struct CanCastAbilitiesTag : IComponent, IEquatable<CanCastAbilitiesTag>
+public struct CanCastAbilitiesTag : IComponent
 {
-    public bool Equals(CanCastAbilitiesTag other) => true;
-    public override bool Equals(object? obj) => obj is CanCastAbilitiesTag;
-    public override int GetHashCode() => 0;
-    public static bool operator ==(CanCastAbilitiesTag left, CanCastAbilitiesTag right) => true;
-    public static bool operator !=(CanCastAbilitiesTag left, CanCastAbilitiesTag right) => false;
 }
 

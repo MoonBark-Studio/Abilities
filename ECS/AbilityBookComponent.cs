@@ -202,24 +202,14 @@ public struct AbilityLearningComponent : IComponent, IEquatable<AbilityLearningC
 /// <summary>
 /// Tag for entities that can learn new abilities.
 /// </summary>
-public struct CanLearnAbilitiesTag : IComponent, IEquatable<CanLearnAbilitiesTag>
+public struct CanLearnAbilitiesTag : IComponent
 {
-    public bool Equals(CanLearnAbilitiesTag other) => true;
-    public override bool Equals(object? obj) => obj is CanLearnAbilitiesTag;
-    public override int GetHashCode() => 0;
-    public static bool operator ==(CanLearnAbilitiesTag left, CanLearnAbilitiesTag right) => true;
-    public static bool operator !=(CanLearnAbilitiesTag left, CanLearnAbilitiesTag right) => false;
 }
 
 /// <summary>
 /// Tag for entities that are currently learning an ability.
 /// </summary>
-public struct LearningAbilityTag : IComponent, IEquatable<LearningAbilityTag>
+public struct LearningAbilityTag : IComponent
 {
-    public bool Equals(LearningAbilityTag other) => true;
-    public override bool Equals(object? obj) => obj is LearningAbilityTag;
-    public override int GetHashCode() => 0;
-    public static bool operator ==(LearningAbilityTag left, LearningAbilityTag right) => true;
-    public static bool operator !=(LearningAbilityTag left, LearningAbilityTag right) => false;
 }
 
