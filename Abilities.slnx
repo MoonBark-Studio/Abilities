@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MoonBark.Abilities.csproj" />
+  <Project Path="../../cores/MoonBark.Framework/MoonBark.Framework.csproj" />
+</Solution>
