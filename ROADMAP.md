@@ -3,16 +3,15 @@
 **Module:** `internal.Abilities`
 
 ## Action Items from Latest Audit
-- [ ] ECS refactor: move 9 files with ECS types into cs/ECS/ subdirectory
-  - `internal/Abilities/Core/AbilityBookComponent.cs`
-  - `internal/Abilities/Core/AbilityComponent.cs`
-  - `internal/Abilities/Core/AbilityComponents.cs`
-
+- [ ] ECS refactor: move 7 files with ECS types into ECS/ subdirectory
+  - `plugins/Abilities/Core/Execution/AbilityCommandHandler.cs`
+  - `plugins/Abilities/godot/scripts/AbilitiesPlugin.cs`
+  - `plugins/Abilities/godot/scripts/AbilityDemo.cs`
 ## TODO
 <!-- Action items in priority order -->
 
 ## Future Work
-<!-- Ideas, nice-to-haves -->
+<!-- Action items in priority order -->
 
 ## Changelog
 ### 2026-04-18
@@ -26,3 +25,13 @@
 
 ### 2026-04-18
 - No auto-fixable issues found.
+## Future Work
+<!-- Ideas, nice-to-haves -->
+
+## Changelog
+### 2026-04-27
+- Audit run — 0 total issues (33 changed files)
+- ECS violations: 7
+- Framework bridge gaps: 0
+
+<!-- previous entries preserved -->

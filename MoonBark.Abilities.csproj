@@ -4,6 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Abilities</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +15,19 @@
     <ProjectReference Include="..\..\cores\MoonBark.Framework\MoonBark.Framework.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(GodotBuild)' == 'true'">
+    <PackageReference Include="GodotSharp" Version="4.6.2" />
+    <PackageReference Include="Godot.SourceGenerators" Version="4.6.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Exclude test files from the main plugin build -->
     <Compile Remove="Tests/**/*.cs" />
+    <!-- Godot-specific files only included when GodotBuild is true -->
+    <Compile Remove="godot/**/*.cs" Condition="'$(GodotBuild)' != 'true'" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(GodotBuild)' == 'true'">
+    <Compile Include="godot/**/*.cs" />
   </ItemGroup>
 </Project>

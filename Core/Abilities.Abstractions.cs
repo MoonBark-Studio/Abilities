@@ -33,3 +33,4 @@ public interface IAbilityDefinition
     float Range { get; }
     IReadOnlyList<IEffectDefinition> Effects { get; }
 }
+

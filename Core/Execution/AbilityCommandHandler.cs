@@ -1,8 +1,10 @@
 namespace MoonBark.Abilities.Core.Execution;
 
+using MoonBark.Abilities.Core.Effects;
 using MoonBark.Abilities.ECS;
 using MoonBark.Framework.Commands;
 using MoonBark.Framework.Commands.Bus;
+using MoonBark.Framework.Effects;
 using Friflo.Engine.ECS;
 using System;
 using System.Threading.Tasks;
@@ -119,7 +121,10 @@ public sealed class AbilityCommandHandler : ICommandHandler<AbilityCommand>
         if (caster.HasComponent<ManaComponent>())
         {
             ref var mana = ref caster.GetComponent<ManaComponent>();
-            mana.ConsumeMana(abilityDef.ManaCost);
+            if (!mana.ConsumeMana(abilityDef.ManaCost))
+            {
+                return AbilityCommandResult.Failure($"Insufficient mana (need {abilityDef.ManaCost}, have {mana.CurrentMana})");
+            }
         }
 
         // Start cooldown
@@ -132,7 +137,117 @@ public sealed class AbilityCommandHandler : ICommandHandler<AbilityCommand>
                 caster.AddComponent(new OnCooldownTag());
         }
 
+        // Apply effects (Core logic - no Godot dependencies)
+        // Effects are applied but actual visual/Godot reactions happen via signal bus
+        ApplyEffects(caster, abilityDef);
+
         return AbilityCommandResult.Success($"Ability '{abilityDef.Name}' executed successfully");
+    }
+
+    /// <summary>
+    /// Applies all effects from an ability definition to the caster and/or targets.
+    /// This is pure Core logic - no Godot dependencies.
+    /// Godot integration happens via AbilitySignalBus which listens to component changes.
+    /// </summary>
+    private void ApplyEffects(Entity caster, IAbilityDefinition abilityDef)
+    {
+        if (abilityDef.Effects == null || abilityDef.Effects.Count == 0)
+            return;
+
+        foreach (var effect in abilityDef.Effects)
+        {
+            // Core effect application - modifies ECS components
+            // Visual/Godot reactions are handled separately via signals
+            ApplyEffectToEntity(caster, effect);
+        }
+    }
+
+    /// <summary>
+    /// Applies a single effect to an entity by modifying its components.
+    /// Pure Core logic - no Godot dependencies.
+    /// </summary>
+    private void ApplyEffectToEntity(Entity entity, IEffectDefinition effect)
+    {
+        // Effect application modifies ECS components
+        // Godot layer observes these changes via signals or system queries
+        
+        if (effect is DamageEffect damageEffect)
+        {
+            ApplyDamageEffect(entity, damageEffect);
+        }
+        else if (effect is HealEffect healEffect)
+        {
+            ApplyHealEffect(entity, healEffect);
+        }
+        else if (effect is BuffEffect buffEffect)
+        {
+            ApplyBuffEffect(entity, buffEffect);
+        }
+        else if (effect is DebuffEffect debuffEffect)
+        {
+            ApplyDebuffEffect(entity, debuffEffect);
+        }
+        else if (effect is SummonEffect summonEffect)
+        {
+            ApplySummonEffect(entity, summonEffect);
+        }
+    }
+
+    private void ApplyDamageEffect(Entity entity, DamageEffect effect)
+    {
+        if (entity.HasComponent<HealthComponent>())
+        {
+            ref var health = ref entity.GetComponent<HealthComponent>();
+            float damage = effect.Amount;
+            
+            // Apply resistance if present
+            if (entity.HasComponent<ResistanceComponent>())
+            {
+                var resistance = entity.GetComponent<ResistanceComponent>();
+                damage *= (1f - resistance.DamageReduction);
+            }
+            
+            health.Damage(damage);
+            
+            // Entity died
+            if (!health.IsAlive && !entity.HasComponent<DeadTag>())
+            {
+                entity.AddComponent(new DeadTag());
+            }
+        }
+    }
+
+    private void ApplyHealEffect(Entity entity, HealEffect effect)
+    {
+        if (entity.HasComponent<HealthComponent>())
+        {
+            ref var health = ref entity.GetComponent<HealthComponent>();
+            health.Heal(effect.Amount);
+        }
+        else if (entity.HasComponent<ManaComponent>())
+        {
+            // Some heal effects apply to mana
+            ref var mana = ref entity.GetComponent<ManaComponent>();
+            mana.RegenerateMana(effect.Amount);
+        }
+    }
+
+    private void ApplyBuffEffect(Entity entity, BuffEffect effect)
+    {
+        // Buffs typically modify stats via components
+        // Implementation depends on game-specific stat system
+        // Could add/modify StatComponent, SpeedComponent, etc.
+    }
+
+    private void ApplyDebuffEffect(Entity entity, DebuffEffect effect)
+    {
+        // Similar to buff but with negative modifiers
+    }
+
+    private void ApplySummonEffect(Entity entity, SummonEffect effect)
+    {
+        // Summoning creates new entities
+        // Implementation depends on game-specific summon system
     }
 }
 
