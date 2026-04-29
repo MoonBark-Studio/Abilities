@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://demo_abilities"]
+
+[ext_resource type="Script" path="res://godot/scripts/WorldManager.cs" id="1_world"]
+[ext_resource type="Script" path="res://godot/scripts/GodotAbilityNode.cs" id="2_ability"]
+
+[node name="AbilityDemo" type="Node3D"]
+
+[node name="WorldManager" type="Node3D" parent="."]
+script = ExtResource("1_world")
+auto_update_systems = true
+mana_regen_rate = 5.0
+
+[node name="Player" type="GodotAbilityNode" parent="WorldManager"]
+script = ExtResource("2_ability")
+ability_id = "fireball"
+max_mana = 100.0
+initial_mana = 100.0
+auto_register = true
+position = Vector3(0, 0, 0)
+
+[node name="Enemy" type="GodotAbilityNode" parent="WorldManager"]
+script = ExtResource("2_ability")
+ability_id = "heal"
+max_mana = 50.0
+initial_mana = 50.0
+auto_register = true
+position = Vector3(5, 0, 0)
