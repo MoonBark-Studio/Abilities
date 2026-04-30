@@ -260,9 +260,9 @@ Following MoonBark standards:
 - ✅ `Tests/` contains xUnit tests (no Godot runtime)
 
 ## Status
-- ✅ Audited: 2026-04-27
-- Changed files this run: 33
-- File count: 33 C# files (~3316 lines)
+- ✅ Audited: 2026-04-30
+- Changed files this run: 3
+- File count: 33 C# files (~3252 lines)
 ## Documentation
 
 - [Godot Integration Guide](godot/README.md) — Detailed Godot usage
@@ -271,9 +271,8 @@ Following MoonBark standards:
 - [Health](HEALTH.md) — Project health & metrics
 
 ## Key Types
-## Key Types (33 files, ~3316 lines)
+## Key Types (33 files, ~3252 lines)
 AbilitiesModule, AbilitiesPlugin, AbilityBookComponent, AbilityCommandHandler, AbilityCommandTypesTests, AbilityComponent, AbilityComponentTests, AbilityCooldownComponent, AbilityCooldownSystem, AbilityDefinition, AbilityDefinitionTests, AbilityDemo, AbilityKind, AbilityLearningComponent, AbilityRegistry, AbilityRegistryTests, AbilitySignalBus, AbilitySlotKind, BuffEffect, BuffStats
-
 ## Namespaces
 - `MoonBark.Abilities.Core`
 - `MoonBark.Abilities.Core.Effects`
@@ -282,7 +281,6 @@ AbilitiesModule, AbilitiesPlugin, AbilityBookComponent, AbilityCommandHandler, A
 - `MoonBark.Abilities.Godot`
 - `MoonBark.Abilities.Godot.Examples`
 - `MoonBark.Abilities.Tests`
-
 ## ECS Architecture (v2)
 - ECS subdirectories: ECS
 - ECS files outside subdirectories: 7
